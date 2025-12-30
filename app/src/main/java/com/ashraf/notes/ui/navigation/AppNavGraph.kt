@@ -23,7 +23,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.Todos.route) {
-            TodoScreen()
+            TodoScreen(navController)
         }
 
         composable(
@@ -44,13 +44,22 @@ fun AppNavGraph(
         }
 
         composable(
-            route = "edit_todo/{todoId}"
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments
-                ?.getString("todoId")
-                ?.toLong() ?: -1
+    route = "edit_todo/{todoId}?title={title}"
+) { backStackEntry ->
 
-            EditTodoScreen(todoId = id)
-        }
+    val id = backStackEntry.arguments
+        ?.getString("todoId")
+        ?.toLong() ?: -1
+
+    val title = backStackEntry.arguments
+        ?.getString("title") ?: ""
+
+    EditTodoScreen(
+        todoId = id,
+        navController = navController,
+        initialTitle = title
+    )
+}
+
     }
 }

@@ -15,7 +15,11 @@ sealed class Routes(val route: String) {
     }
 
 
-    data object EditTodo : Routes("edit_todo/{todoId}") {
-        fun create(todoId: Long) = "edit_todo/$todoId"
-    }
+    data object EditTodo : Routes(
+    "edit_todo/{todoId}?title={title}"
+) {
+    fun create(todoId: Long, title: String = "") =
+        "edit_todo/$todoId?title=${Uri.encode(title)}"
+}
+
 }

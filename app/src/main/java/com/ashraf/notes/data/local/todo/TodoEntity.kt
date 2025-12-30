@@ -9,5 +9,6 @@ data class TodoEntity(
     val id: Long = 0,
     val title: String,
     val completed: Boolean = false,
+    val dueDate: Long? = null,
     val reminderTime: Long? = null
 )

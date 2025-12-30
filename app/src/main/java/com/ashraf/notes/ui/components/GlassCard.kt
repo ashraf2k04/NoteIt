@@ -2,12 +2,13 @@ package com.ashraf.notes.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -17,37 +18,33 @@ fun GlassCard(
     selected: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val backgroundBrush =
+    val scheme = MaterialTheme.colorScheme
+    val isDark = isSystemInDarkTheme()
+
+    val background =
         if (selected) {
-            Brush.linearGradient(
-                listOf(
-                    Color(0xFF4FC3F7).copy(alpha = 0.25f),
-                    Color(0xFF4FC3F7).copy(alpha = 0.15f)
-                )
-            )
+            scheme.primary.copy(alpha = 0.25f)
         } else {
-            Brush.linearGradient(
-                listOf(
-                    Color.White.copy(alpha = 0.12f),
-                    Color.White.copy(alpha = 0.05f)
-                )
-            )
+            if (isDark)
+                Color.White.copy(alpha = 0.12f)
+            else
+                Color.Black.copy(alpha = 0.05f)
         }
 
-    val borderColor =
-        if (selected) Color(0xFF4FC3F7)
-        else Color.White.copy(alpha = 0.15f)
+    val border =
+        if (selected) scheme.primary
+        else scheme.onSurface.copy(alpha = 0.12f)
 
     Box(
         modifier = modifier
             .background(
-                brush = backgroundBrush,
-                shape = RoundedCornerShape(24.dp)
+                background,
+                RoundedCornerShape(24.dp)
             )
             .border(
-                width = if (selected) 2.dp else 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(24.dp)
+                1.dp,
+                border,
+                RoundedCornerShape(24.dp)
             )
             .padding(16.dp)
     ) {

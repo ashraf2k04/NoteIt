@@ -136,10 +136,10 @@ fun HomeScreen(
                         title = "Create New Todo",
                         hint = "Todo title",
                         onDismiss = { showDialog = false },
-                        onConfirm = {
+                        onConfirm = { todoTitle ->
                             showDialog = false
                             navController.navigate(
-                                Routes.EditTodo.create(-1)
+                                Routes.EditTodo.create(-1, todoTitle)
                             )
                         }
                     )

@@ -5,28 +5,78 @@ import androidx.lifecycle.viewModelScope
 import com.ashraf.notes.data.local.todo.TodoDao
 import com.ashraf.notes.data.local.todo.TodoEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val dao: TodoDao
+    private val todoDao: TodoDao
 ) : ViewModel() {
 
-    val todos = dao.getTodos()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val todos = todoDao.getTodos()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun add(title: String) {
+    fun insertTodo(
+        title: String,
+        completed: Boolean,
+        dueDate: Long?,
+        reminderTime: Long?,
+        onResult: (Long) -> Unit = {}
+    ) {
+        if (title.isBlank()) return
+
         viewModelScope.launch {
-            dao.insert(TodoEntity(title = title))
+            val id = todoDao.insert(
+                TodoEntity(
+                    title = title,
+                    completed = completed,
+                    dueDate = dueDate,
+                    reminderTime = reminderTime
+                )
+            )
+            onResult(id)
         }
     }
 
-    fun toggle(todo: TodoEntity) {
+    suspend fun loadTodo(todoId: Long): TodoEntity? {
+        return todoDao.getTodoById(todoId)
+    }
+
+
+    fun updateTodo(
+        id: Long,
+        title: String,
+        completed: Boolean,
+        dueDate: Long?,
+        reminderTime: Long?
+    ) {
+        if (id == -1L || title.isBlank()) return
+
         viewModelScope.launch {
-            dao.update(todo.copy(completed = !todo.completed))
+            todoDao.update(
+                TodoEntity(
+                    id = id,
+                    title = title,
+                    completed = completed,
+                    dueDate = dueDate,
+                    reminderTime = reminderTime
+                )
+            )
+        }
+    }
+
+    fun toggleCompleted(todo: TodoEntity) {
+        viewModelScope.launch {
+            todoDao.update(todo.copy(completed = !todo.completed))
+        }
+    }
+
+    fun deleteTodos(ids: List<Long>) {
+        viewModelScope.launch {
+            todoDao.deleteTodos(ids)
         }
     }
 }
+

@@ -18,7 +18,7 @@ interface NoteDao {
     @Query("DELETE FROM notes WHERE id IN (:ids)")
     suspend fun deleteNotes(ids: List<Long>)
 
-    @Query("SELECT * FROM notes ORDER BY createdAt DESC LIMIT 5")
+    @Query("SELECT * FROM notes ORDER BY createdAt DESC")
     suspend fun getNotesOnce(): List<NoteEntity>
 
 
