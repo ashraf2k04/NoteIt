@@ -15,6 +15,7 @@ import com.ashraf.notes.ui.todo.components.showDateTimePicker
 import com.ashraf.notes.ui.todo.helpers.formatDateTime
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.HorizontalDivider
+import com.ashraf.notes.ui.todo.components.CircularCheckbox
 
 
 @Composable
@@ -79,7 +80,7 @@ fun EditTodoScreen(
 
         TitleEditor(
             title = title,
-            onTitleChange = { 
+            onTitleChange = {
                 title = it
                 hasChanges = true
             },
@@ -92,9 +93,9 @@ fun EditTodoScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Checkbox(
+            CircularCheckbox(
                 checked = completed,
-                onCheckedChange = { 
+                onCheckedChange = {
                     completed = it
                     hasChanges = true
                 }

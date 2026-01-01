@@ -9,8 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ashraf.notes.ui.theme.DarkGlassCard
+import com.ashraf.notes.ui.theme.LightGlassCard
 
 @Composable
 fun GlassCard(
@@ -23,28 +24,28 @@ fun GlassCard(
 
     val background =
         if (selected) {
-            scheme.primary.copy(alpha = 0.25f)
+            scheme.primary.copy(alpha = 0.22f)
         } else {
-            if (isDark)
-                Color.White.copy(alpha = 0.12f)
-            else
-                Color.Black.copy(alpha = 0.05f)
+            if (isDark) DarkGlassCard else LightGlassCard
         }
 
     val border =
-        if (selected) scheme.primary
-        else scheme.onSurface.copy(alpha = 0.12f)
+        if (selected) {
+            scheme.primary
+        } else {
+            scheme.onSurface.copy(alpha = 0.10f)
+        }
 
     Box(
         modifier = modifier
             .background(
-                background,
-                RoundedCornerShape(24.dp)
+                color = background,
+                shape = RoundedCornerShape(24.dp)
             )
             .border(
-                1.dp,
-                border,
-                RoundedCornerShape(24.dp)
+                width = 1.dp,
+                color = border,
+                shape = RoundedCornerShape(24.dp)
             )
             .padding(16.dp)
     ) {

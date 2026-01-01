@@ -1,7 +1,9 @@
 package com.ashraf.notes.ui.notes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
@@ -10,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ashraf.notes.ui.notes.components.*
 import com.ashraf.notes.ui.notes.helpers.NoteString
 import com.ashraf.notes.ui.notes.helpers.applyHighlight
-import androidx.compose.material3.*
 
 @Composable
 fun EditNoteScreen(
@@ -30,7 +31,6 @@ fun EditNoteScreen(
     var hasChanges by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
 
-    // 🔹 Load note from DB
     LaunchedEffect(noteId) {
         if (noteId != -1L) {
             val (t, text, hl) = viewModel.loadNote(noteId)
@@ -41,13 +41,9 @@ fun EditNoteScreen(
         }
     }
 
-    // 🔹 Handle SYSTEM back
     BackHandler {
-        if (hasChanges) {
-            showExitDialog = true
-        } else {
-            navController.popBackStack()
-        }
+        if (hasChanges) showExitDialog = true
+        else navController.popBackStack()
     }
 
     Column(
@@ -56,52 +52,40 @@ fun EditNoteScreen(
             .padding(top = 20.dp, bottom = 20.dp)
     ) {
 
-        // 🔝 Top bar
-        EditorTopRow(
-            onBack = {
-                if (hasChanges) {
-                    showExitDialog = true
-                } else {
-                    navController.popBackStack()
+        // 🔝 Animated Top Bar
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + slideInVertically { -it / 2 },
+            exit = fadeOut() + slideOutVertically { -it / 2 }
+        ) {
+            EditorTopRow(
+                onBack = {
+                    if (hasChanges) showExitDialog = true
+                    else navController.popBackStack()
+                },
+                onSave = {
+                    viewModel.saveNoteAsync(
+                        actualNoteId,
+                        note.title,
+                        note.text,
+                        note.highlightColor
+                    ) {
+                        hasChanges = false
+                        navController.popBackStack()
+                    }
                 }
-            },
-            onSave = {
-                viewModel.saveNoteAsync(
-                    actualNoteId,
-                    note.title,
-                    note.text,
-                    note.highlightColor
-                ) { newId ->
-                    actualNoteId = newId
-                    hasChanges = false
-                    navController.popBackStack()
-                }
-            }
-        )
+            )
+        }
 
-        // 📝 Title editor (keeps autosave like before)
         TitleEditor(
             title = note.title,
             onTitleChange = {
                 note = note.copy(title = it)
                 hasChanges = true
             },
-            onSave = {
-                if (actualNoteId != -1L) {
-                    viewModel.saveNoteAsync(
-                        actualNoteId,
-                        note.title,
-                        note.text,
-                        note.highlightColor
-                    ) { newId ->
-                        actualNoteId = newId
-                        hasChanges = false
-                    }
-                }
-            }
+            onSave = {}
         )
 
-        // ✍️ Text editor
         HighlightableTextField(
             value = textFieldValue,
             note = note,
@@ -120,46 +104,51 @@ fun EditNoteScreen(
                 .weight(1f)
         )
 
-        // 🎨 Bottom toolbar
-        KeyboardAwareBottomBar(Modifier) {
-            NoteEditorToolbar(
-                onIncreaseFont = {
-                    note = note.copy(fontSizeSp = (note.fontSizeSp + 2f).coerceAtMost(40f))
-                    hasChanges = true
-                },
-                onDecreaseFont = {
-                    note = note.copy(fontSizeSp = (note.fontSizeSp - 2f).coerceAtLeast(12f))
-                    hasChanges = true
-                },
-                onBold = {
-                    note = note.copy(bold = !note.bold)
-                    hasChanges = true
-                },
-                onItalic = {
-                    note = note.copy(italic = !note.italic)
-                    hasChanges = true
-                },
-                onUnderline = {
-                    note = note.copy(underline = !note.underline)
-                    hasChanges = true
-                },
-                onHighlight = { color ->
-                    val sel = textFieldValue.selection
-                    note = note.copy(
-                        highlightColor = applyHighlight(
-                            sel.start,
-                            sel.end,
-                            color,
-                            note.highlightColor
+        // 🔻 Animated Bottom Toolbar
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + slideInVertically { it },
+            exit = fadeOut() + slideOutVertically { it }
+        ) {
+            KeyboardAwareBottomBar(Modifier) {
+                NoteEditorToolbar(
+                    onIncreaseFont = {
+                        note = note.copy(fontSizeSp = (note.fontSizeSp + 2f).coerceAtMost(40f))
+                        hasChanges = true
+                    },
+                    onDecreaseFont = {
+                        note = note.copy(fontSizeSp = (note.fontSizeSp - 2f).coerceAtLeast(12f))
+                        hasChanges = true
+                    },
+                    onBold = {
+                        note = note.copy(bold = !note.bold)
+                        hasChanges = true
+                    },
+                    onItalic = {
+                        note = note.copy(italic = !note.italic)
+                        hasChanges = true
+                    },
+                    onUnderline = {
+                        note = note.copy(underline = !note.underline)
+                        hasChanges = true
+                    },
+                    onHighlight = { color ->
+                        val sel = textFieldValue.selection
+                        note = note.copy(
+                            highlightColor = applyHighlight(
+                                sel.start,
+                                sel.end,
+                                color,
+                                note.highlightColor
+                            )
                         )
-                    )
-                    hasChanges = true
-                }
-            )
+                        hasChanges = true
+                    }
+                )
+            }
         }
     }
 
-    // ⚠️ Unsaved changes dialog
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
@@ -179,9 +168,7 @@ fun EditNoteScreen(
                             navController.popBackStack()
                         }
                     }
-                ) {
-                    Text("Save")
-                }
+                ) { Text("Save") }
             },
             dismissButton = {
                 Row {
@@ -190,13 +177,9 @@ fun EditNoteScreen(
                             showExitDialog = false
                             navController.popBackStack()
                         }
-                    ) {
-                        Text("Discard")
-                    }
+                    ) { Text("Discard") }
 
-                    TextButton(
-                        onClick = { showExitDialog = false }
-                    ) {
+                    TextButton(onClick = { showExitDialog = false }) {
                         Text("Cancel")
                     }
                 }

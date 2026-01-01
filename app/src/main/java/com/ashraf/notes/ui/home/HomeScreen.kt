@@ -1,35 +1,24 @@
 package com.ashraf.notes.ui.home
 
 import android.os.Build
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ashraf.notes.ui.components.AddItemDialog
 import com.ashraf.notes.ui.components.DynamicFab
 import com.ashraf.notes.ui.navigation.AppNavGraph
 import com.ashraf.notes.ui.navigation.Routes
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,21 +26,31 @@ fun HomeScreen(
     navController: NavHostController
 ) {
 
-
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    val showFab = currentRoute == Routes.Notes.route ||
-            currentRoute == Routes.Todos.route
+    var scaffoldRoute by remember { mutableStateOf(currentRoute) }
+
+    LaunchedEffect(currentRoute) {
+        delay(16)
+        scaffoldRoute = currentRoute
+    }
+
+    val isEditScreen =
+        scaffoldRoute?.startsWith("edit_note") == true ||
+                scaffoldRoute?.startsWith("edit_todo") == true
+
+    val showFab =
+        scaffoldRoute == Routes.Notes.route ||
+                scaffoldRoute == Routes.Todos.route
 
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
+
         topBar = {
-            if (
-                currentRoute?.startsWith("edit_note") != true &&
-                currentRoute?.startsWith("edit_todo") != true
-            ) {
+            if (!isEditScreen) {
                 CenterAlignedTopAppBar(
                     title = { Text("NoteIT") },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -60,46 +59,91 @@ fun HomeScreen(
                 )
             }
         },
+
         floatingActionButton = {
             if (showFab) {
                 DynamicFab { showDialog = true }
             }
         },
+
         bottomBar = {
-            if (currentRoute == Routes.Notes.route || currentRoute == Routes.Todos.route) {
-               NavigationBar {
+            if (
+                scaffoldRoute == Routes.Notes.route ||
+                scaffoldRoute == Routes.Todos.route
+            ) {
+                NavigationBar(
+                    tonalElevation = 4.dp
+                ) {
                     NavigationBarItem(
-                        selected = currentRoute == Routes.Notes.route,
+                        selected = scaffoldRoute == Routes.Notes.route,
                         onClick = {
                             navController.navigate(Routes.Notes.route) {
-                                popUpTo(Routes.Notes.route) { inclusive = true }
+                                popUpTo(Routes.Notes.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         },
-                        icon = { Icon(Icons.Default.AddCircle, null) },
-                        label = { Text("Notes") }
+                        icon = {
+                            Icon(
+                                Icons.Default.EditNote,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text("Notes") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
                     )
 
                     NavigationBarItem(
-                        selected = currentRoute == Routes.Todos.route,
+                        selected = scaffoldRoute == Routes.Todos.route,
                         onClick = {
-                            navController.navigate(Routes.Todos.route)
+                            navController.navigate(Routes.Todos.route) {
+                                popUpTo(Routes.Notes.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
-                        icon = { Icon(Icons.Default.CheckCircle, null) },
-                        label = { Text("Todos") }
+                        icon = {
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text("Todos") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
                     )
                 }
             }
-
-        },
-        contentWindowInsets = WindowInsets(0)
+        }
     ) { padding ->
 
         Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
-                .then(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && showDialog) {
-                        Modifier.graphicsLayer {
+        ) {
+            AppNavGraph(navController)
+
+            if (
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                showDialog &&
+                !isEditScreen
+            ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .graphicsLayer {
                             renderEffect =
                                 android.graphics.RenderEffect
                                     .createBlurEffect(
@@ -109,14 +153,12 @@ fun HomeScreen(
                                     )
                                     .asComposeRenderEffect()
                         }
-                    } else Modifier
-                    )) {
-            AppNavGraph(navController)
+                )
+            }
         }
 
         if (showDialog) {
-            when (currentRoute) {
-
+            when (scaffoldRoute) {
                 Routes.Notes.route -> {
                     AddItemDialog(
                         title = " Create New Note",
@@ -148,5 +190,3 @@ fun HomeScreen(
         }
     }
 }
-
-

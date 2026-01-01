@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashraf.notes.data.local.todo.TodoDao
 import com.ashraf.notes.data.local.todo.TodoEntity
+import com.ashraf.notes.ui.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,20 +15,27 @@ class TodoViewModel @Inject constructor(
     private val todoDao: TodoDao
 ) : ViewModel() {
 
-    val todos = todoDao.getTodos()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val todosState: StateFlow<UiState<List<TodoEntity>>> =
+        todoDao.getTodos()
+            .map<List<TodoEntity>, UiState<List<TodoEntity>>> {
+                UiState.Success(it)
+            }
+            .catch { emit(UiState.Error("Failed to load todos")) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                UiState.Loading
+            )
 
     fun insertTodo(
         title: String,
         completed: Boolean,
         dueDate: Long?,
-        reminderTime: Long?,
-        onResult: (Long) -> Unit = {}
+        reminderTime: Long?
     ) {
         if (title.isBlank()) return
-
         viewModelScope.launch {
-            val id = todoDao.insert(
+            todoDao.insert(
                 TodoEntity(
                     title = title,
                     completed = completed,
@@ -36,14 +43,11 @@ class TodoViewModel @Inject constructor(
                     reminderTime = reminderTime
                 )
             )
-            onResult(id)
         }
     }
 
-    suspend fun loadTodo(todoId: Long): TodoEntity? {
-        return todoDao.getTodoById(todoId)
-    }
-
+    suspend fun loadTodo(todoId: Long): TodoEntity? =
+        todoDao.getTodoById(todoId)
 
     fun updateTodo(
         id: Long,
@@ -53,7 +57,6 @@ class TodoViewModel @Inject constructor(
         reminderTime: Long?
     ) {
         if (id == -1L || title.isBlank()) return
-
         viewModelScope.launch {
             todoDao.update(
                 TodoEntity(
@@ -79,4 +82,3 @@ class TodoViewModel @Inject constructor(
         }
     }
 }
-

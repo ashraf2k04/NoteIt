@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ fun SwipeToDismiss(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(100.dp)
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragEnd = {
@@ -64,7 +64,7 @@ fun SwipeToDismiss(
         // Background actions
         AnimatedVisibility(
             visible = abs(offsetX) > swipeThreshold / 2,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
         ) {
             Box(
                 modifier = Modifier
@@ -72,9 +72,9 @@ fun SwipeToDismiss(
                     .background(
                         color =
                             if (offsetX > 0)
-                                Color(0xFF2E7D32) // green
+                                Color(0xE979C27E) // green
                             else
-                                Color(0xFFC62828), // red
+                                Color(0xC9C94747), // red
                         shape = RoundedCornerShape(24.dp)
                     )
                     .padding(horizontal = 24.dp),
@@ -87,9 +87,9 @@ fun SwipeToDismiss(
                 Icon(
                     imageVector =
                         if (offsetX > 0)
-                            Icons.Default.Check
+                            Icons.Default.CheckCircle
                         else
-                            Icons.Default.Close,
+                            Icons.Default.DeleteSweep,
                     contentDescription = null,
                     tint = Color.White
                 )

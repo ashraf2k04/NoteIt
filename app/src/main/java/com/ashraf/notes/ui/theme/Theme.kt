@@ -1,55 +1,75 @@
 package com.ashraf.notes.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-/* ---------- GLASSY DARK ---------- */
+/* ---------- LIGHT SCHEME ---------- */
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xC82D689B),
-    secondary = Color(0xFFFFD54F),
-    tertiary = Color(0xFF80CBC4),
+private val LightScheme = lightColorScheme(
 
-    background = Color(0xFF5E799A),
-    surface = Color(0xFF000000), // translucent surface
-    onPrimary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White
+    /* Primary */
+    primary = LightNotesColors.primary,
+    onPrimary = LightNotesColors.onPrimary,
+
+    /* Secondary (used by NavigationBar unselected state internally) */
+    secondary = LightNotesColors.iconSecondary,
+    onSecondary = LightNotesColors.textPrimary,
+
+    /* Backgrounds */
+    background = LightNotesColors.background,
+    onBackground = LightNotesColors.textPrimary,
+
+    /* Surfaces */
+    surface = LightNotesColors.surface,
+    onSurface = LightNotesColors.textPrimary,
+
+    /* Cards / Containers */
+    surfaceVariant = LightNotesColors.card,
+    onSurfaceVariant = LightNotesColors.textSecondary,
+
+    /* Borders / Dividers */
+    outline = LightNotesColors.border,
+    outlineVariant = LightNotesColors.divider
 )
 
-/* ---------- OPTIONAL LIGHT ---------- */
+/* ---------- DARK SCHEME ---------- */
 
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xCB1C539A),
-    secondary = Color(0xFFFFB300),
-    tertiary = Color(0xFF00796B),
+private val DarkScheme = darkColorScheme(
 
-    background = Color(0xFFF4F6FA),
-    surface = Color.White,
-    onPrimary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+    /* Primary */
+    primary = DarkNotesColors.primary,
+    onPrimary = DarkNotesColors.onPrimary,
+
+    /* Secondary */
+    secondary = DarkNotesColors.iconSecondary,
+    onSecondary = DarkNotesColors.textPrimary,
+
+    /* Backgrounds */
+    background = DarkNotesColors.background,
+    onBackground = DarkNotesColors.textPrimary,
+
+    /* Surfaces */
+    surface = DarkNotesColors.surface,
+    onSurface = DarkNotesColors.textPrimary,
+
+    /* Cards / Containers */
+    surfaceVariant = DarkNotesColors.card,
+    onSurfaceVariant = DarkNotesColors.textSecondary,
+
+    /* Borders / Dividers */
+    outline = DarkNotesColors.border,
+    outlineVariant = DarkNotesColors.divider
 )
+
+/* ---------- THEME ---------- */
 
 @Composable
 fun NotesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context)
-            else dynamicLightColorScheme(context)
-        }
-        darkTheme -> darkColorScheme()
-        else -> lightColorScheme()
-    }
+    val colorScheme = if (darkTheme) DarkScheme else LightScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -57,4 +77,3 @@ fun NotesTheme(
         content = content
     )
 }
-

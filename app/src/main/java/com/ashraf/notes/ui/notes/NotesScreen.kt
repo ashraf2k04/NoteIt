@@ -3,20 +3,20 @@ package com.ashraf.notes.ui.notes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ashraf.notes.ui.common.UiState
 import com.ashraf.notes.ui.components.GlassCard
 import com.ashraf.notes.ui.components.GlassyBackground
+import com.ashraf.notes.ui.components.SwipeToDismiss
 import com.ashraf.notes.ui.navigation.Routes
 
 @Composable
@@ -24,7 +24,7 @@ fun NotesScreen(
     navController: androidx.navigation.NavController,
     viewModel: NotesViewModel = hiltViewModel()
 ) {
-    val notes by viewModel.notes.collectAsState()
+    val state by viewModel.notesState.collectAsState()
 
     var selectionMode by remember { mutableStateOf(false) }
     var selectedIds by remember { mutableStateOf(setOf<Long>()) }
@@ -39,105 +39,121 @@ fun NotesScreen(
     }
 
     GlassyBackground {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
+        when (state) {
+            UiState.Loading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
 
-            // 🔝 Selection header
-            if (selectionMode) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            is UiState.Error -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "${selectedIds.size} selected",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Text(
-                        text = "Delete",
-                        color = Color.Red,
-                        modifier = Modifier.clickable {
-                            showDeleteDialog = true
-                        }
+                        (state as UiState.Error).message,
+                        color = Color.White
                     )
                 }
             }
 
-            if (notes.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+            is UiState.Success -> {
+                val notes = (state as UiState.Success).data
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    GlassCard(
-                        modifier = Modifier
-                            .padding(24.dp)
-                            .clickable {
-                                navController.navigate(Routes.EditNote.create(-1))
-                            }
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                    // 🔝 Selection header
+                    if (selectionMode) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                text = "Create your first note",
+                                text = "${selectedIds.size} selected",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White
+                                color = Color.White,
+                                modifier = Modifier.weight(1f)
                             )
-                            Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Tap to start writing",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.7f)
+                                text = "Delete",
+                                color = Color.Red,
+                                modifier = Modifier.clickable {
+                                    showDeleteDialog = true
+                                }
                             )
                         }
                     }
-                }
-            } else {
-                LazyColumn {
-                    items(notes) { note ->
-                        val isSelected = selectedIds.contains(note.id)
 
-                        GlassCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(90.dp)
-                                .padding(bottom = 12.dp)
-                                .combinedClickable(
-                                    onClick = {
-                                        if (selectionMode) {
-                                            toggleSelection(note.id)
-                                        } else {
-                                            navController.navigate(
-                                                Routes.EditNote.create(note.id)
+                    if (notes.isEmpty()) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            GlassCard(
+                                modifier = Modifier.clickable {
+                                    navController.navigate(
+                                        Routes.EditNote.create(-1)
+                                    )
+                                }
+                            ) {
+                                Text("Create your first note", color = Color.White)
+                            }
+                        }
+                    } else {
+                        LazyColumn {
+                            items(notes, key = { it.id }) { note ->
+                                val isSelected = selectedIds.contains(note.id)
+
+                                SwipeToDismiss(
+                                    onSwipedLeft = {
+                                        // ✅ LEFT SWIPE → ENTER SELECTION MODE + SELECT NOTE
+                                        if (!selectionMode) {
+                                            selectionMode = true
+                                        }
+                                        toggleSelection(note.id)
+                                    },
+                                    onSwipedRight = {
+                                        // ❌ RIGHT SWIPE BLOCKED (NO ACTION)
+                                    }
+                                ) {
+                                    GlassCard(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(bottom = 12.dp)
+                                            .combinedClickable(
+                                                onClick = {
+                                                    if (selectionMode) {
+                                                        toggleSelection(note.id)
+                                                    } else {
+                                                        navController.navigate(
+                                                            Routes.EditNote.create(note.id)
+                                                        )
+                                                    }
+                                                },
+                                                onLongClick = {
+                                                    selectionMode = true
+                                                    toggleSelection(note.id)
+                                                }
+                                            ),
+                                        selected = isSelected
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(start = 10.dp),
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(
+                                                text = note.title,
+                                                color = Color.White
+                                            )
+                                            Spacer(Modifier.height(4.dp))
+                                            Text(
+                                                text = note.text.take(30) + "...",
+                                                color = Color.White.copy(alpha = 0.7f)
                                             )
                                         }
-                                    },
-                                    onLongClick = {
-                                        selectionMode = true
-                                        toggleSelection(note.id)
                                     }
-                                ),
-                            selected = isSelected
-                        ) {
-                            Column {
-                                Text(
-                                    text = note.title,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = note.text
-                                        .replace("\\s+".toRegex(), " ")
-                                        .take(30) + "...",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.7f)
-                                )
+                                }
                             }
                         }
                     }
@@ -146,7 +162,7 @@ fun NotesScreen(
         }
     }
 
-    // 🗑 DELETE CONFIRMATION DIALOG
+    // 🗑 DELETE CONFIRMATION
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
