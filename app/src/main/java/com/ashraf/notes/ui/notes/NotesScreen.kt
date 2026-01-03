@@ -1,5 +1,6 @@
 package com.ashraf.notes.ui.notes
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import com.ashraf.notes.ui.components.GlassyBackground
 import com.ashraf.notes.ui.components.SwipeToDismiss
 import com.ashraf.notes.ui.navigation.Routes
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NotesScreen(
     navController: androidx.navigation.NavController,
@@ -50,7 +52,6 @@ fun NotesScreen(
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         (state as UiState.Error).message,
-                        color = Color.White
                     )
                 }
             }
@@ -75,7 +76,6 @@ fun NotesScreen(
                             Text(
                                 text = "${selectedIds.size} selected",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
                             Text(
@@ -144,13 +144,11 @@ fun NotesScreen(
                                         ) {
                                             Text(
                                                 text = note.title,
-                                                color = Color.White
                                             )
                                             Spacer(Modifier.height(4.dp))
                                             Text(
                                                 text = note.text.take(30) + "...",
-                                                color = Color.White.copy(alpha = 0.7f)
-                                            )
+                                                )
                                         }
                                     }
                                 }

@@ -1,5 +1,6 @@
 package com.ashraf.notes.ui.todo
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -20,7 +21,7 @@ import com.ashraf.notes.ui.components.SwipeToDismiss
 import com.ashraf.notes.ui.navigation.Routes
 import com.ashraf.notes.ui.todo.components.CircularCheckbox
 import com.ashraf.notes.ui.todo.helpers.formatDateTime
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TodoScreen(
     navController: androidx.navigation.NavController,
@@ -50,7 +51,7 @@ fun TodoScreen(
 
             is UiState.Error -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text((state as UiState.Error).message, color = Color.White)
+                    Text((state as UiState.Error).message)
                 }
             }
 
@@ -74,7 +75,6 @@ fun TodoScreen(
                             Text(
                                 text = "${selectedIds.size} selected",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
 
@@ -97,7 +97,7 @@ fun TodoScreen(
                                     )
                                 }
                             ) {
-                                Text("Create your first todo", color = Color.White)
+                                Text("Create your first todo")
                             }
                         }
                     } else {
@@ -159,9 +159,7 @@ fun TodoScreen(
                                                     text = todo.title,
                                                     style = MaterialTheme.typography.titleMedium,
                                                     color =
-                                                        if (todo.completed)
-                                                            Color.White.copy(alpha = 0.4f)
-                                                        else Color.White
+                                                            Color.DarkGray.copy(alpha = 0.4f)
                                                 )
 
                                                 Row(
@@ -171,7 +169,7 @@ fun TodoScreen(
                                                         Text(
                                                             "📅 ${formatDateTime(todo.dueDate)}",
                                                             style = MaterialTheme.typography.bodySmall,
-                                                            color = Color.White.copy(alpha = 0.6f)
+
                                                         )
                                                     }
 
@@ -179,7 +177,7 @@ fun TodoScreen(
                                                         Text(
                                                             "⏰ ${formatDateTime(todo.reminderTime)}",
                                                             style = MaterialTheme.typography.bodySmall,
-                                                            color = Color.White.copy(alpha = 0.6f)
+                                                            
                                                         )
                                                     }
                                                 }
