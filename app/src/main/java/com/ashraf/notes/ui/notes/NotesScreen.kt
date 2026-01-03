@@ -62,7 +62,7 @@ fun NotesScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(4.dp)
                 ) {
 
                     // 🔝 Selection header
@@ -106,6 +106,7 @@ fun NotesScreen(
                                 val isSelected = selectedIds.contains(note.id)
 
                                 SwipeToDismiss(
+                                    isSelected = isSelected,
                                     onSwipedLeft = {
                                         // ✅ LEFT SWIPE → ENTER SELECTION MODE + SELECT NOTE
                                         if (!selectionMode) {
@@ -120,7 +121,6 @@ fun NotesScreen(
                                     GlassCard(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(bottom = 12.dp)
                                             .combinedClickable(
                                                 onClick = {
                                                     if (selectionMode) {

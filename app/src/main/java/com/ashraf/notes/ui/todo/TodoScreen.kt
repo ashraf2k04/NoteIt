@@ -27,6 +27,7 @@ fun TodoScreen(
     navController: androidx.navigation.NavController,
     viewModel: TodoViewModel = hiltViewModel()
 ) {
+
     val state by viewModel.todosState.collectAsState()
 
     var selectionMode by remember { mutableStateOf(false) }
@@ -40,6 +41,7 @@ fun TodoScreen(
 
         if (selectedIds.isEmpty()) selectionMode = false
     }
+
 
     GlassyBackground {
         when (state) {
@@ -106,6 +108,7 @@ fun TodoScreen(
                                 val isSelected = selectedIds.contains(todo.id)
 
                                 SwipeToDismiss(
+                                    isSelected = isSelected,
                                     onSwipedLeft = {
                                         // ✅ LEFT SWIPE → ENTER SELECTION MODE + SELECT ITEM
                                         if (!selectionMode) {
@@ -115,76 +118,80 @@ fun TodoScreen(
                                     },
                                     onSwipedRight = {
                                         // ✅ RIGHT SWIPE → TOGGLE COMPLETED (ONLY IF NOT SELECTING)
-                                            viewModel.toggleCompleted(todo)
+                                        viewModel.toggleCompleted(todo)
 
-                                    }
-                                ) {
-                                    GlassCard(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(bottom = 12.dp)
-                                            .combinedClickable(
-                                                onClick = {
-                                                    if (selectionMode) {
+                                    },
+                                    content = {
+                                        GlassCard(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(bottom = 12.dp)
+                                                .combinedClickable(
+                                                    onClick = {
+                                                        if (selectionMode) {
+                                                            toggleSelection(todo.id)
+                                                        } else {
+                                                            navController.navigate(
+                                                                Routes.EditTodo.create(todo.id)
+                                                            )
+                                                        }
+                                                    },
+                                                    onLongClick = {
+                                                        selectionMode = true
                                                         toggleSelection(todo.id)
-                                                    } else {
-                                                        navController.navigate(
-                                                            Routes.EditTodo.create(todo.id)
-                                                        )
                                                     }
-                                                },
-                                                onLongClick = {
-                                                    selectionMode = true
-                                                    toggleSelection(todo.id)
-                                                }
-                                            ),
-                                        selected = isSelected
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxHeight(),
-                                            verticalAlignment = Alignment.CenterVertically
+                                                ),
+                                            selected = isSelected
                                         ) {
-                                            CircularCheckbox(
-                                                checked = todo.completed,
-                                                onCheckedChange = {
-                                                    viewModel.toggleCompleted(todo)
-                                                }
-                                            )
-
-                                            Column(
-                                                modifier = Modifier.padding(start = 10.dp),                                                verticalArrangement = Arrangement.SpaceEvenly
+                                            Row(
+                                                modifier = Modifier.fillMaxHeight(),
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                Text(
-                                                    modifier = Modifier.padding(start = 20.dp),
-                                                    text = todo.title,
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    color =
-                                                            Color.DarkGray.copy(alpha = 0.4f)
+                                                CircularCheckbox(
+                                                    checked = todo.completed,
+                                                    onCheckedChange = {
+                                                        viewModel.toggleCompleted(todo)
+                                                    }
                                                 )
 
-                                                Row(
-                                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                                Column(
+                                                    modifier = Modifier.padding(start = 10.dp),
+                                                    verticalArrangement = Arrangement.SpaceEvenly
                                                 ) {
-                                                    if (todo.dueDate != null) {
-                                                        Text(
-                                                            "📅 ${formatDateTime(todo.dueDate)}",
-                                                            style = MaterialTheme.typography.bodySmall,
+                                                    Text(
+                                                        modifier = Modifier.padding(start = 20.dp),
+                                                        text = todo.title,
+                                                        style = MaterialTheme.typography.titleMedium,
+                                                        color =
+                                                            Color.DarkGray.copy(alpha = 0.4f)
+                                                    )
 
+                                                    Row(
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            12.dp
                                                         )
-                                                    }
+                                                    ) {
+                                                        if (todo.dueDate != null) {
+                                                            Text(
+                                                                "📅 ${formatDateTime(todo.dueDate)}",
+                                                                style = MaterialTheme.typography.bodySmall,
 
-                                                    if (todo.reminderTime != null) {
-                                                        Text(
-                                                            "⏰ ${formatDateTime(todo.reminderTime)}",
-                                                            style = MaterialTheme.typography.bodySmall,
-                                                            
-                                                        )
+                                                                )
+                                                        }
+
+                                                        if (todo.reminderTime != null) {
+                                                            Text(
+                                                                "⏰ ${formatDateTime(todo.reminderTime)}",
+                                                                style = MaterialTheme.typography.bodySmall,
+
+                                                                )
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
-                                }
+                                    },
+                                )
                             }
                         }
                     }

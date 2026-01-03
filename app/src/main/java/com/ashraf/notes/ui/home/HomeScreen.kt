@@ -1,5 +1,7 @@
 package com.ashraf.notes.ui.home
 
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -47,7 +50,7 @@ fun HomeScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0),
+        contentWindowInsets = WindowInsets(0,0,0,0),
 
         topBar = {
             if (!isEditScreen) {
@@ -89,14 +92,14 @@ fun HomeScreen(
                                 contentDescription = null
                             )
                         },
-                        label = { Text("Notes") },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                        )
+                        label = { Text("Notes") }
+//                        colors = NavigationBarItemDefaults.colors(
+//                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+//                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+//                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+//                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+//                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+//                        )
                     )
 
                     NavigationBarItem(
@@ -114,24 +117,31 @@ fun HomeScreen(
                                 contentDescription = null
                             )
                         },
-                        label = { Text("Todos") },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                        )
+                        label = { Text("Todos") }
+//                        colors = NavigationBarItemDefaults.colors(
+//                            selectedIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+//                            selectedTextColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+//                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+//                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+//                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+//                        )
                     )
                 }
             }
         }
     ) { padding ->
 
+            val reducedPadding =PaddingValues(
+                top = (padding.calculateTopPadding() - 1.dp).coerceAtLeast(0.dp),
+                bottom = (padding.calculateBottomPadding() - 1.dp).coerceAtLeast(0.dp),
+                start = (padding.calculateStartPadding(LayoutDirection.Ltr) - 1.dp).coerceAtLeast(0.dp),
+                end = (padding.calculateEndPadding(LayoutDirection.Ltr) - 1.dp).coerceAtLeast(0.dp)
+            )
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(reducedPadding )
         ) {
             AppNavGraph(navController)
 
@@ -145,11 +155,11 @@ fun HomeScreen(
                         .matchParentSize()
                         .graphicsLayer {
                             renderEffect =
-                                android.graphics.RenderEffect
+                                RenderEffect
                                     .createBlurEffect(
                                         8f,
                                         8f,
-                                        android.graphics.Shader.TileMode.CLAMP
+                                        Shader.TileMode.CLAMP
                                     )
                                     .asComposeRenderEffect()
                         }

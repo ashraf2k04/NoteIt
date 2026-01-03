@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
@@ -30,6 +31,7 @@ fun SwipeToDismiss(
     onSwipedLeft: () -> Unit = {},
     onSwipedRight: () -> Unit = {},
     swipeThreshold: Float = 180f,
+    isSelected: Boolean,
     content: @Composable () -> Unit
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -75,9 +77,9 @@ fun SwipeToDismiss(
                                 Color(0xE979C27E) // green
                             else
                                 Color(0xC9C94747), // red
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = 8.dp),
                 contentAlignment =
                     if (offsetX > 0)
                         Alignment.CenterStart
@@ -87,9 +89,9 @@ fun SwipeToDismiss(
                 Icon(
                     imageVector =
                         if (offsetX > 0)
-                            Icons.Default.CheckCircle
-                        else
-                            Icons.Default.DeleteSweep,
+                             Icons.Default.CheckCircle
+                        else{
+                            if (isSelected)Icons.Default.DeleteSweep else Icons.Default.DeleteForever},
                     contentDescription = null,
                     tint = Color.White
                 )

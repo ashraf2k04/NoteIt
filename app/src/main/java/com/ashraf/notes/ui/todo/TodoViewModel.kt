@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashraf.notes.data.local.todo.TodoDao
 import com.ashraf.notes.data.local.todo.TodoEntity
+import com.ashraf.notes.notification.ReminderScheduler
 import com.ashraf.notes.ui.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val todoDao: TodoDao
+    private val todoDao: TodoDao,
+    private val reminderScheduler : ReminderScheduler
 ) : ViewModel() {
 
     val todosState: StateFlow<UiState<List<TodoEntity>>> =
@@ -34,8 +36,9 @@ class TodoViewModel @Inject constructor(
         reminderTime: Long?
     ) {
         if (title.isBlank()) return
+
         viewModelScope.launch {
-            todoDao.insert(
+            val id = todoDao.insert(
                 TodoEntity(
                     title = title,
                     completed = completed,
@@ -43,8 +46,13 @@ class TodoViewModel @Inject constructor(
                     reminderTime = reminderTime
                 )
             )
+
+            if (reminderTime != null) {
+                reminderScheduler.schedule(id, title, reminderTime)
+            }
         }
     }
+
 
     suspend fun loadTodo(todoId: Long): TodoEntity? =
         todoDao.getTodoById(todoId)
@@ -58,6 +66,9 @@ class TodoViewModel @Inject constructor(
     ) {
         if (id == -1L || title.isBlank()) return
         viewModelScope.launch {
+
+            reminderScheduler.cancel(id)
+
             todoDao.update(
                 TodoEntity(
                     id = id,
@@ -67,6 +78,9 @@ class TodoViewModel @Inject constructor(
                     reminderTime = reminderTime
                 )
             )
+            if (reminderTime != null) {
+                reminderScheduler.schedule(id, title, reminderTime)
+            }
         }
     }
 
@@ -78,6 +92,7 @@ class TodoViewModel @Inject constructor(
 
     fun deleteTodos(ids: List<Long>) {
         viewModelScope.launch {
+            ids.forEach { reminderScheduler.cancel(it) }
             todoDao.deleteTodos(ids)
         }
     }

@@ -70,7 +70,7 @@ fun EditTodoScreen(
             },
             onSave = {
                 if (todoId == -1L) {
-                    viewModel.insertTodo(title, completed, dueDate, reminder)
+                    viewModel.insertTodo( title, completed, dueDate, reminder)
                 } else {
                     viewModel.updateTodo(todoId, title, completed, dueDate, reminder)
                 }
@@ -160,7 +160,7 @@ fun EditTodoScreen(
                 TextButton(
                     onClick = {
                         if (todoId == -1L) {
-                            viewModel.insertTodo(title, completed, dueDate, reminder)
+                            viewModel.insertTodo( title, completed, dueDate, reminder)
                         } else {
                             viewModel.updateTodo(todoId, title, completed, dueDate, reminder)
                         }

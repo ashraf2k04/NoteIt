@@ -47,9 +47,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    // ✅ Correct way to read Glance parameter
-                    val route = intent?.extras?.getString(RouteKey.name)
+                    // 🔔 Read todoId from notification
+                    val todoIdFromNotification =
+                        intent?.getLongExtra("todo_id", -1L)
 
+                    // 🔁 Navigate when notification is clicked
+                    LaunchedEffect(todoIdFromNotification) {
+                        if (todoIdFromNotification != null && todoIdFromNotification != -1L) {
+                            navController.navigate("todo_edit/$todoIdFromNotification") {
+                                launchSingleTop = true
+                            }
+                            intent?.removeExtra("todo_id") // 🔥 prevent re-trigger
+                        }
+                    }
+
+                    // Existing Glance deep link handling (keep this)
+                    val route = intent?.extras?.getString(RouteKey.name)
                     LaunchedEffect(route) {
                         route?.let {
                             navController.navigate(it) {
@@ -65,6 +78,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }
 

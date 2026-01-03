@@ -22,7 +22,7 @@ private val LightScheme = lightColorScheme(
 
     /* Surfaces */
     surface = LightNotesColors.surface,
-    onSurface = LightNotesColors.textPrimary,
+    onSurface = LightNotesColors.onSurface,
 
     /* Cards / Containers */
     surfaceVariant = LightNotesColors.card,
@@ -30,7 +30,15 @@ private val LightScheme = lightColorScheme(
 
     /* Borders / Dividers */
     outline = LightNotesColors.border,
-    outlineVariant = LightNotesColors.divider
+    outlineVariant = LightNotesColors.divider,
+
+    primaryContainer = LightNotesColors.primaryContainer,
+    onPrimaryContainer = LightNotesColors.onPrimaryContainer,
+
+    surfaceContainerHigh = LightNotesColors.surfaceContainerHigh,
+
+    surfaceContainer = LightNotesColors.surfaceContainer,
+    secondaryContainer = LightNotesColors.secondaryContainer,
 )
 
 /* ---------- DARK SCHEME ---------- */
@@ -55,11 +63,23 @@ private val DarkScheme = darkColorScheme(
 
     /* Cards / Containers */
     surfaceVariant = DarkNotesColors.card,
-    onSurfaceVariant = DarkNotesColors.textSecondary,
+    //onSurfaceVariant = DarkNotesColors.textSecondary,
+
+    surfaceContainer = DarkNotesColors.surfaceContainer,
+    onSurfaceVariant = DarkNotesColors.onSurfaceVariant,
+
+
 
     /* Borders / Dividers */
     outline = DarkNotesColors.border,
-    outlineVariant = DarkNotesColors.divider
+    outlineVariant = DarkNotesColors.divider,
+
+    primaryContainer = DarkNotesColors.primaryContainer,
+    onPrimaryContainer = DarkNotesColors.onPrimaryContainer,
+
+    surfaceContainerHigh = DarkNotesColors.surfaceContainerHigh,
+
+    secondaryContainer = DarkNotesColors.secondaryContainer,
 )
 
 /* ---------- THEME ---------- */
