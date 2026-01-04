@@ -1,4 +1,4 @@
-package com.ashraf.notes.ui.components
+package com.ashraf.notes.ui.home.components
 
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults
@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.tooling.preview.Preview
+import com.ashraf.notes.ui.components.GlassCard
 
 
 @Composable
@@ -24,9 +24,15 @@ fun AddItemDialog(
         GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
+                .wrapContentSize()
                 .padding(24.dp)
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize()
+                    .padding(24.dp)
+            ) {
 
                 // TITLE
                 Text(
@@ -83,16 +89,4 @@ fun AddItemDialog(
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun Alert(){
-    AddItemDialog(
-        title = " Create New Note",
-        hint = "Note title",
-        onDismiss = { },
-        onConfirm = { }
-    )
 }

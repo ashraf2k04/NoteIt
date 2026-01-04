@@ -1,6 +1,7 @@
 package com.ashraf.notes.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,9 +12,11 @@ import com.ashraf.notes.ui.todo.TodoScreen
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier
 ) {
     NavHost(
+        modifier = modifier,
         navController = navController,
         startDestination = Routes.Notes.route
     ) {
@@ -27,39 +30,30 @@ fun AppNavGraph(
         }
 
         composable(
-            route =  "edit_note/{noteId}?title={title}"
+            route =  "edit_note/{noteId}"
         ) { backStackEntry ->
             val id = backStackEntry.arguments
                 ?.getString("noteId")
                 ?.toLong() ?: -1
 
-            val title = backStackEntry.arguments
-                ?.getString("title") ?: ""
-
             EditNoteScreen(
                 noteId = id,
-                navController = navController,
-                initialTitle = title
+                navController = navController
             )
         }
 
         composable(
-    route = "edit_todo/{todoId}?title={title}"
-) { backStackEntry ->
+            route = "edit_todo/{todoId}"
+        ) { backStackEntry ->
 
-    val id = backStackEntry.arguments
-        ?.getString("todoId")
-        ?.toLong() ?: -1
+            val id = backStackEntry.arguments
+                ?.getString("todoId")
+                ?.toLong() ?: -1
 
-    val title = backStackEntry.arguments
-        ?.getString("title") ?: ""
-
-    EditTodoScreen(
-        todoId = id,
-        navController = navController,
-        initialTitle = title
-    )
-}
-
+            EditTodoScreen(
+                todoId = id,
+                navController = navController
+            )
+        }
     }
 }

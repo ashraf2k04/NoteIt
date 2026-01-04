@@ -21,5 +21,4 @@ interface NoteDao {
     @Query("SELECT * FROM notes ORDER BY createdAt DESC")
     suspend fun getNotesOnce(): List<NoteEntity>
 
-
 }

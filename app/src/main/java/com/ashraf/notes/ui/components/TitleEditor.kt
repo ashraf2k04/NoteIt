@@ -1,7 +1,8 @@
-package com.ashraf.notes.ui.notes.components
+package com.ashraf.notes.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
@@ -18,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun TitleEditor(
@@ -35,6 +37,7 @@ fun TitleEditor(
         textStyle = MaterialTheme.typography.headlineMedium,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(8.dp)
             .onFocusChanged { focusState ->
                 if (isFocused && !focusState.isFocused) {
                     // 🔥 Focus LOST → autosave

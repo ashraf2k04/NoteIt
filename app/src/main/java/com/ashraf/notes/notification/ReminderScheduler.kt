@@ -28,14 +28,21 @@ class ReminderScheduler @Inject constructor(
         val alarmManager =
             context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            !alarmManager.canScheduleExactAlarms()
-        ) {
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                time,
-                pendingIntent
-            )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    time,
+                    pendingIntent
+                )
+            } else {
+                // fallback (will be inexact but works)
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    time,
+                    pendingIntent
+                )
+            }
         } else {
             alarmManager.setExact(
                 AlarmManager.RTC_WAKEUP,
@@ -43,6 +50,7 @@ class ReminderScheduler @Inject constructor(
                 pendingIntent
             )
         }
+
     }
 
     fun cancel(id: Long) {

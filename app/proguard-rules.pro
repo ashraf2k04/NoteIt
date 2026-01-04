@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Keep Compose (safe)
+-keep class androidx.compose.** { *; }
+
+# Keep coroutines metadata
+-keepclassmembers class kotlinx.coroutines.** { *; }
+-dontwarn kotlinx.coroutines.**
+
+# Keep Navigation arguments (if any)
+-keepclassmembers class ** {
+    @androidx.navigation.NavArgs *;
+}

@@ -47,7 +47,7 @@ fun HighlightableTextField(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(4.dp),
         textStyle = TextStyle(
             fontSize = note.fontSizeSp.sp,
             fontWeight = if (note.bold) FontWeight.Bold else FontWeight.Normal,

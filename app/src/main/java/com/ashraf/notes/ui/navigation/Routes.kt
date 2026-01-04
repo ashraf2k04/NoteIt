@@ -1,6 +1,5 @@
 package com.ashraf.notes.ui.navigation
 
-import android.net.Uri
 
 sealed class Routes(val route: String) {
 
@@ -8,18 +7,17 @@ sealed class Routes(val route: String) {
     data object Todos : Routes("todos")
 
     object EditNote : Routes(
-        "edit_note/{noteId}?title={title}"
+        "edit_note/{noteId}"
     ) {
-        fun create(noteId: Long, title: String = "") =
-            "edit_note/$noteId?title=${Uri.encode(title)}"
+        fun create(noteId: Long) =
+            "edit_note/$noteId"
     }
 
 
     data object EditTodo : Routes(
-    "edit_todo/{todoId}?title={title}"
-) {
-    fun create(todoId: Long, title: String = "") =
-        "edit_todo/$todoId?title=${Uri.encode(title)}"
-}
-
+        "edit_todo/{todoId}"
+    ) {
+        fun create(todoId: Long) =
+            "edit_todo/$todoId"
+    }
 }

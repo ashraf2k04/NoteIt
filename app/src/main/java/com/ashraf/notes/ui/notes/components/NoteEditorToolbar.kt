@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -14,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatItalic
 import androidx.compose.material.icons.filled.FormatUnderlined
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -31,17 +32,24 @@ import com.ashraf.notes.ui.notes.helpers.toComposeColor
 
 @Composable
 fun NoteEditorToolbar(
+    modifier : Modifier,
     onHighlight: (HighlightColor) -> Unit,
     onBold: () -> Unit,
     onItalic: () -> Unit,
     onUnderline: () -> Unit,
     onIncreaseFont: () -> Unit,   // 👈 NEW
-    onDecreaseFont: () -> Unit    // 👈 NEW
+    onDecreaseFont: () -> Unit// 👈 NEW
 ) {
-    BottomAppBar( modifier = Modifier.fillMaxWidth() )
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .height(50.dp)
+            .padding(4.dp)
+            )
     {
         LazyRow(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 12.dp)
