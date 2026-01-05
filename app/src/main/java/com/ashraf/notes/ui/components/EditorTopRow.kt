@@ -1,4 +1,4 @@
-package com.ashraf.notes.ui.notes.components
+package com.ashraf.notes.ui.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +24,7 @@ fun EditorTopRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .padding(top = 18.dp, start = 12.dp, end = 12.dp),
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBack) {

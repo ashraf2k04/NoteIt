@@ -162,8 +162,7 @@ fun TodoScreen(
                                                         modifier = Modifier.padding(start = 20.dp),
                                                         text = todo.title,
                                                         style = MaterialTheme.typography.titleMedium,
-                                                        color =
-                                                            Color.DarkGray.copy(alpha = 0.4f)
+                                                        color = Color.White
                                                     )
 
                                                     Row(

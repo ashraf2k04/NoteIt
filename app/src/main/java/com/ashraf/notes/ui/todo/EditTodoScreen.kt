@@ -3,33 +3,31 @@ package com.ashraf.notes.ui.todo
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.ashraf.notes.ui.notes.components.EditorTopRow
-import com.ashraf.notes.ui.notes.components.KeyboardAwareBottomBar
-import com.ashraf.notes.ui.notes.components.TitleEditor
-import com.ashraf.notes.ui.todo.components.showDateTimePicker
-import com.ashraf.notes.ui.todo.helpers.formatDateTime
 import androidx.activity.compose.BackHandler
-import androidx.compose.material3.HorizontalDivider
-import com.ashraf.notes.ui.todo.components.CircularCheckbox
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ashraf.notes.ui.components.EditorTopRow
+import com.ashraf.notes.ui.components.TitleEditor
+import com.ashraf.notes.ui.components.DeleteAlert
+import com.ashraf.notes.ui.todo.helpers.formatDateTime
+import com.ashraf.notes.ui.todo.components.CheckMarker
+import com.ashraf.notes.ui.todo.components.BottomActionBar
+import com.ashraf.notes.ui.todo.components.showDateTimePicker
 
 
 @Composable
 fun EditTodoScreen(
     todoId: Long,
     navController: androidx.navigation.NavController,
-    viewModel: TodoViewModel = hiltViewModel(),
-    initialTitle: String
+    viewModel: TodoViewModel = hiltViewModel()
 ) {
 
     var hasChanges by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
 
-    var title by remember { mutableStateOf(initialTitle) }
+    var title by remember { mutableStateOf("") }
     var completed by remember { mutableStateOf(false) }
     var dueDate by remember { mutableStateOf<Long?>(null) }
     var reminder by remember { mutableStateOf<Long?>(null) }
@@ -47,17 +45,14 @@ fun EditTodoScreen(
     }
 
     BackHandler {
-        if (hasChanges) {
-            showExitDialog = true
-        } else {
-            navController.popBackStack()
-        }
+        if (hasChanges) showExitDialog = true
+        else navController.popBackStack()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 20.dp)
+            .padding(WindowInsets.ime.union(WindowInsets.systemBars).asPaddingValues())
     ) {
 
         EditorTopRow(
@@ -70,7 +65,7 @@ fun EditTodoScreen(
             },
             onSave = {
                 if (todoId == -1L) {
-                    viewModel.insertTodo( title, completed, dueDate, reminder)
+                    viewModel.insertTodo(title, completed, dueDate, reminder)
                 } else {
                     viewModel.updateTodo(todoId, title, completed, dueDate, reminder)
                 }
@@ -89,105 +84,71 @@ fun EditTodoScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            CircularCheckbox(
-                checked = completed,
-                onCheckedChange = {
-                    completed = it
+        CheckMarker(
+            completed = completed,
+            onCheckedChange = {
+                completed = it
+                hasChanges = true
+            }
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        dueDate?.let {
+            Text(
+                text = "Due by : ${formatDateTime(it)}",
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        reminder?.let {
+            Text(
+                text = "Reminder by : ${formatDateTime(it)}",
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        val context = LocalContext.current
+
+        BottomActionBar(
+            dueDate = dueDate,
+            reminder = reminder,
+            onSetDueDate = {
+                showDateTimePicker(context) { selected ->
+                    dueDate = selected
                     hasChanges = true
                 }
-            )
-            Spacer(Modifier.width(8.dp))
-            Text("Mark as completed")
-        }
-
-        Spacer(Modifier.weight(1f)) // 🔥 pushes buttons to bottom
-
-        KeyboardAwareBottomBar(Modifier) {
-            Column {
-                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
-
-                val context = LocalContext.current
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(
-                        onClick = {
-                            showDateTimePicker(context) { selected ->
-                                dueDate = selected
-                                hasChanges = true
-                            }
-                        }
-                    ) {
-                        Text(
-                            if (dueDate == null) "Set Due Date"
-                            else "Due: ${formatDateTime(dueDate!!)}"
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            showDateTimePicker(context) { selected ->
-                                reminder = selected
-                                hasChanges = true
-                            }
-                        }
-                    ) {
-                        Text(
-                            if (reminder == null) "Set Reminder"
-                            else "Remind: ${formatDateTime(reminder!!)}"
-                        )
-                    }
+            },
+            onSetReminder = {
+                showDateTimePicker(context) { selected ->
+                    reminder = selected
+                    hasChanges = true
                 }
             }
-        }
+        )
     }
 
     if (showExitDialog) {
-        AlertDialog(
-            onDismissRequest = { showExitDialog = false },
-            title = { Text("Unsaved changes") },
-            text = { Text("Do you want to save your changes before leaving?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (todoId == -1L) {
-                            viewModel.insertTodo( title, completed, dueDate, reminder)
-                        } else {
-                            viewModel.updateTodo(todoId, title, completed, dueDate, reminder)
-                        }
-                        showExitDialog = false
-                        navController.popBackStack()
-                    }
-                ) {
-                    Text("Save")
-                }
+        DeleteAlert(
+            onDismiss = {
+                showExitDialog = false
             },
-            dismissButton = {
-                Row {
-                    TextButton(
-                        onClick = {
-                            showExitDialog = false
-                            navController.popBackStack()
-                        }
-                    ) {
-                        Text("Discard")
-                    }
-
-                    TextButton(
-                        onClick = { showExitDialog = false }
-                    ) {
-                        Text("Cancel")
-                    }
+            onSave = {
+                if (todoId == -1L) {
+                    viewModel.insertTodo(title, completed, dueDate, reminder)
+                } else {
+                    viewModel.updateTodo(todoId, title, completed, dueDate, reminder)
                 }
+                showExitDialog = false
+                navController.popBackStack()
+            },
+            onDiscard = {
+                showExitDialog = false
+                navController.popBackStack()
             }
         )
     }

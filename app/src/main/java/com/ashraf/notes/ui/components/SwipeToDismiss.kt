@@ -35,10 +35,10 @@ fun SwipeToDismiss(
     content: @Composable () -> Unit
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
-    var swiped by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
+            .padding(2.dp)
             .fillMaxWidth()
             .height(100.dp)
             .pointerInput(Unit) {
@@ -47,11 +47,9 @@ fun SwipeToDismiss(
                         when {
                             offsetX > swipeThreshold -> {
                                 onSwipedRight()
-                                swiped = true
                             }
                             offsetX < -swipeThreshold -> {
                                 onSwipedLeft()
-                                swiped = true
                             }
                         }
                         offsetX = 0f
@@ -71,6 +69,7 @@ fun SwipeToDismiss(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(10.dp)
                     .background(
                         color =
                             if (offsetX > 0)
@@ -79,7 +78,7 @@ fun SwipeToDismiss(
                                 Color(0xC9C94747), // red
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 16.dp),
                 contentAlignment =
                     if (offsetX > 0)
                         Alignment.CenterStart
@@ -91,7 +90,7 @@ fun SwipeToDismiss(
                         if (offsetX > 0)
                              Icons.Default.CheckCircle
                         else{
-                            if (isSelected)Icons.Default.DeleteSweep else Icons.Default.DeleteForever},
+                            if (!isSelected)Icons.Default.DeleteSweep else Icons.Default.DeleteForever},
                     contentDescription = null,
                     tint = Color.White
                 )
@@ -101,6 +100,7 @@ fun SwipeToDismiss(
         // Foreground content
         Box(
             modifier = Modifier
+                .padding(1.dp)
                 .offset { IntOffset(offsetX.roundToInt(), 0) }
         ) {
             content()

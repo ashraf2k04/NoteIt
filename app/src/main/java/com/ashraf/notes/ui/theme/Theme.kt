@@ -63,12 +63,9 @@ private val DarkScheme = darkColorScheme(
 
     /* Cards / Containers */
     surfaceVariant = DarkNotesColors.card,
-    //onSurfaceVariant = DarkNotesColors.textSecondary,
 
     surfaceContainer = DarkNotesColors.surfaceContainer,
     onSurfaceVariant = DarkNotesColors.onSurfaceVariant,
-
-
 
     /* Borders / Dividers */
     outline = DarkNotesColors.border,
