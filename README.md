@@ -121,12 +121,12 @@ The app is designed to be scalable, lifecycle-safe, and production-ready, with a
 
 ## 📂 Project Structure (Simplified)
 
+```text
 com.ashraf.notes
-│
 ├── data
 │   ├── local
-│   │   ├── note (Entity, DAO)
-│   │   ├── todo (Entity, DAO)
+│   │   ├── note        (Entity, DAO)
+│   │   ├── todo        (Entity, DAO)
 │   │   └── NotesDatabase
 │   ├── di
 │   └── notification
@@ -144,6 +144,7 @@ com.ashraf.notes
 │
 ├── MainActivity
 └── NotesApp
+```
 
 # 🧪 Android Best Practices Followed
 - Offline-first data strategy
