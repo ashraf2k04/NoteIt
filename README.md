@@ -1,7 +1,11 @@
+
+
 # 📝 NoteIt – Offline-First Notes & Todo Application (Android)
 
 NoteIt is a modern, offline-first Notes and Todo management application built using Kotlin and Jetpack Compose, following MVVM architecture with Clean Architecture principles.
 The app is designed to be scalable, lifecycle-safe, and production-ready, with advanced editor features, home-screen widgets, reminders, and a fully reactive UI.
+
+https://github.com/user-attachments/assets/c115917b-2047-40cb-84c2-692be8b3921c
 
 🚀 *Key Features* - 
 -
